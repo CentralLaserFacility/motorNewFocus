@@ -475,6 +475,14 @@ asynStatus nf874xAxis::poll(bool *moving)
   *moving = done ? false : true;
   setIntegerParam(pC_->motorStatusMoving_, *moving);
 
+  // Read the motor connection statuses
+  sprintf(pC_->outString_, "%s QM?", axisName_);
+  comStatus = pC_->writeReadController();
+  if (comStatus) goto skip;
+  done = atoi(pC_->inString_);
+  // printf("Motor Connection status = %d \n", done);
+  setIntegerParam(pC_->motorConnectionStatus_, done);
+
   // Read soft home status (motor at absolute '0'?)
   if(encoderPosition_ == 0.0)
     setIntegerParam(pC_->motorStatusHome_, 1);
